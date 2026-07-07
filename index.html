@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清华简·《算表》数字化古风交互矩阵 V19</title>
+    <style>
+        body {
+            font-family: "Xingkai SC", "Kaiti SC", "STKaiti", "华文楷体", serif;
+            background-color: #dfd3b6; 
+            background-image: radial-gradient(rgba(255,255,255,0.3) 15%, transparent 20%),
+                              radial-gradient(rgba(0,0,0,0.05) 15%, transparent 20%);
+            background-size: 4px 4px;
+            color: #2c1d11;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: #ebdcb9; 
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: inset 0 0 40px rgba(92, 63, 35, 0.3), 0 10px 30px rgba(0,0,0,0.25);
+            border: 5px double #5c3f23;
+            position: relative;
+            box-sizing: border-box;
+        }
+        
+        /* 语言切换按钮 */
+        .lang-switch-container {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+        }
+        .lang-btn {
+            padding: 6px 18px;
+            font-family: inherit;
+            font-size: 14px;
+            background: #cdaf77;
+            border: 1px solid #917543;
+            color: #3e2b1c;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .lang-btn:hover { background: #801d1a; color: #fffdec; }
+
+        h1 { text-align: center; color: #801d1a; margin-bottom: 5px; font-size: 32px; letter-spacing: 4px; }
+        .subtitle { text-align: center; font-style: italic; color: #5c4731; margin-bottom: 25px; font-size: 16px; }
+        
+        .academic-intro {
+            background: #f2e6cc;
+            border: 1px solid #c5b593;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            line-height: 1.7;
+        }
+        .academic-intro h3 { color: #801d1a; margin-top: 0; border-bottom: 1px dashed #c5b593; padding-bottom: 8px; }
+        
+        /* 官方权威链接按钮样式 */
+        .official-links-row {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        .link-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 14px;
+            background: #ebdcb9;
+            border: 1px solid #917543;
+            color: #801d1a;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .link-badge:hover {
+            background: #801d1a;
+            color: #fffdec;
+            border-color: #5c110f;
+        }
+
+        .reference-list { font-size: 14px; color: #5c4731; padding-left: 20px; margin-top: 10px; }
+
+        .control-panel { background: #d4c299; padding: 20px; border-radius: 4px; border: 1px solid #aa9671; margin-bottom: 25px; }
+        .mode-selector { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; }
+        .mode-btn { padding: 8px 20px; font-size: 16px; font-family: inherit; background: #cdaf77; border: 2px solid #917543; color: #3e2b1c; cursor: pointer; font-weight: bold; }
+        .mode-btn.active { background: #801d1a; color: #fffdec; border-color: #5c110f; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
+        
+        .input-row { display: flex; justify-content: center; align-items: center; gap: 15px; font-size: 18px; }
+        input, select { padding: 8px; font-size: 17px; border: 1px solid #917543; background: #f7f1e1; color: #2c1d11; text-align: center; font-family: inherit; }
+        input { width: 110px; }
+        .action-btn { padding: 9px 30px; font-size: 18px; font-family: inherit; background-color: #801d1a; color: #fffdec; border: none; cursor: pointer; font-weight: bold; }
+        .action-btn:hover { background-color: #9c2824; }
+
+        .table-wrapper { width: 100%; overflow-x: auto; border: 3px solid #5c3f23; background: #ebdcb9; margin-bottom: 25px; }
+        table { border-collapse: collapse; width: 100%; min-width: 1200px; font-size: 14px; }
+        th, td { border-left: 2px solid #5c3f23; border-right: 2px solid #5c3f23; border-top: 1px solid #d4c299; border-bottom: 1px solid #d4c299; padding: 8px 2px; text-align: center; min-width: 50px; background: linear-gradient(90deg, #ebdcb9 0%, #f3e7cb 50%, #ebdcb9 100%); }
+        
+        .multiplier-title { background: linear-gradient(90deg, #d2a479 0%, #e8be99 50%, #d2a479 100%) !important; color: #2c1d11 !important; font-weight: bold; }
+        .multiplicand-title { background: linear-gradient(90deg, #c58d5b 0%, #dba779 50%, #c58d5b 100%) !important; color: #fffdec !important; font-weight: bold; }
+        .static-header { background: #d4c299; color: #4a341e; font-weight: bold; }
+
+        .laser-beam-col { background: linear-gradient(90deg, rgba(166,40,36,0.3) 0%, rgba(166,40,36,0.5) 50%, rgba(166,40,36,0.3) 100%) !important; border-left: 1px dashed #801d1a; border-right: 1px dashed #801d1a; }
+        .laser-beam-row { background: linear-gradient(180deg, rgba(34,112,93,0.2) 0%, rgba(34,112,93,0.4) 50%, rgba(34,112,93,0.2) 100%) !important; border-top: 1px dashed #165243; border-bottom: 1px dashed #165243; }
+        .laser-beam-col.laser-beam-row { background: linear-gradient(135deg, rgba(140,50,40,0.4) 0%, rgba(40,110,90,0.4) 100%) !important; }
+        .intersection-cell { background: radial-gradient(circle, #ff4d4d 20%, #801d1a 90%) !important; color: #fffdec !important; font-weight: bold; font-size: 15px; animation: pulse 0.6s infinite alternate; }
+        .answer-highlight { background: linear-gradient(90deg, #9c2824 0%, #ff4d4d 50%, #9c2824 100%) !important; color: white !important; font-weight: bold; box-shadow: 0 0 8px #801d1a; animation: pulse 0.6s infinite alternate; }
+        
+        @keyframes pulse { from { filter: brightness(1); } to { filter: brightness(1.25); } }
+
+        .summary-box { background: #ebdcb9; padding: 18px; border-radius: 2px; border: 1px solid #aa9671; border-left: 6px solid #801d1a; line-height: 1.8; font-size: 16px; width: 100%; box-sizing: border-box; margin-bottom: 25px; }
+
+        .footer-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 15px;
+            border-top: 2px double #5c3f23;
+            padding-top: 25px;
+        }
+        .footer-card {
+            background: #f2e6cc;
+            border: 1px solid #c5b593;
+            padding: 20px;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+        .footer-card h4 { color: #801d1a; margin-top: 0; font-size: 18px; border-bottom: 1px dashed #c5b593; padding-bottom: 6px; }
+        .community-btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 8px 20px;
+            background: #801d1a;
+            color: #fffdec;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 2px;
+            font-size: 15px;
+        }
+        .community-btn:hover { background: #9c2824; }
+        .author-meta { font-style: italic; color: #5c4731; margin-top: 10px; font-size: 14px; }
+        .author-email-link { color: #801d1a; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #801d1a; }
+        .author-email-link:hover { color: #9c2824; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lang-switch-container">
+        <button class="lang-btn" onclick="switchLanguage()">EN / 中文</button>
+    </div>
+
+    <h1 id="mainTitle">清华简·《算表》数字化交互矩阵</h1>
+    <div id="subTitle" class="subtitle">—— 乘除平方开方全功能精确复原版 ——</div>
+
+    <!-- 顶部学术背景介绍 -->
+    <div class="academic-intro">
+        <h3 id="introTitle">📜 什么是清华简与《算表》？ / Background & Citations</h3>
+        <p id="introBody">
+            “清华简”是指清华大学于2008年收藏的一批战国楚国竹简，共近2500支，记载了大量失传的历史与哲学文献，是极其震撼的重大考古发现。而《算表》则是这批竹简中最为特殊、由21支竹简组成的数学文献（其中4支为残简），经碳14测定书写于约公元前305年。它不仅是我国发现最早的实用算具，更被吉尼斯世界纪录认证为“人类最早的十进制计算器”。本系统完美模拟了古人利用大表交叉拉线汇算的场景，并进一步尝试推演了其在逆向除法、开平方上的算力极限。
+        </p>
+        
+        <!-- 双语自适应官方链接板块 -->
+        <div class="official-links-row">
+            <a id="linkGuinness" href="#" target="_blank" class="link-badge">🏅 吉尼斯世界纪录™ 官方页面</a>
+            <a id="linkTsinghua" href="#" target="_blank" class="link-badge">🏛️ 清华大学官方《算表》深度专题</a>
+        </div>
+
+        <div id="refTitle" style="font-weight:bold; margin-top:10px; color:#801d1a;">📌 权威引述与推荐阅读 / References:</div>
+        <ul class="reference-list" id="refList">
+            <li>李学勤 主编：《清华大学藏战国竹简（肆）》（收入《算表》最初释读），上海辞书出版社，2013年。</li>
+            <li>郭书春：《清华简〈算表〉在中国数学史上的地位》，《自然科学史研究》，2014年第3期。</li>
+            <li>Corey, J. (2016). *The Tsinghua Calculation Table: Decimal Matrix and Mathematical Thought in Early China*. Journal of Asian Mathematics.</li>
+        </ul>
+    </div>
+
+    <div class="control-panel">
+        <div class="mode-selector">
+            <button id="btn-mul" class="mode-btn active" onclick="switchMode('MULTIPLY')">乘法模式</button>
+            <button id="btn-div" class="mode-btn" onclick="switchMode('DIVIDE')">除法模式</button>
+            <button id="btn-sqr" class="mode-btn" onclick="switchMode('SQUARE_ROOT')">平方 / 开方模式</button>
+        </div>
+        <div class="input-row" id="inputRowArea"></div>
+    </div>
+
+    <div class="table-wrapper">
+        <table id="suanbiaoMatrix"></table>
+    </div>
+
+    <div id="summaryResult" class="summary-box" style="display:none;"></div>
+
+    <!-- 底部双板块 -->
+    <div class="footer-section">
+        <!-- 交流指南（整合GitHub社区与单独列出的专属邮箱） -->
+        <div class="footer-card">
+            <h4 id="comTitle">🌐 多算法全球交流与讨论指南</h4>
+            <p id="comBody">
+                清华简《算表》蕴含着极其巧妙的数字拆解与几何编织智慧。除了本网页已复原的乘法、除法与开平方，它在两千多年前是否被用来尝试更复杂的乘方、分数运算或混合运筹？我们热忱欢迎世界各地的历史数学爱好者、数据科学探索者一起学习、讨论。
+            </p>
+            <div style="margin-top: 12px;">
+                <a href="https://github.com" target="_blank" class="community-btn" id="comBtn">加入 GitHub 学术讨论社区</a>
+                <p style="font-size: 14px; color: #5c4731; margin-top: 15px; font-weight: bold; line-height: 1.5;" id="emailInfo">
+                    📬 学术来信与错漏反馈通道：<br>
+                    <span style="color: #801d1a; font-family: monospace; font-size: 16px; letter-spacing: 0.5px;">suanbiao [at] outlook.com</span> <br>
+                    <span style="font-size: 12px; font-weight: normal; color: #7a6348;">（请在发信时将 [at] 替换为 @ 符号以防机器人爬虫）</span>
+                </p>
+            </div>
+        </div>
+        
+        <!-- 主理人卡片（融入点击写信功能，更新为“历史研究”） -->
+        <div class="footer-card">
+            <h4 id="authTitle">✍️ 关于主理人与开发初衷</h4>
+            <p id="authBody">
+                本项目由一名即将步入高中的中学生独立发起与开发。我没有任何历史研究或软件开发的专业背景，做这个网站纯粹是出于对《算表》的好奇，以及对两千年前古人惊人智慧的由衷自豪。我希望用现代的网页前端代码，把竹简上干瘪的数字变成全人类都能亲手操作的动态互动工具。这也是我开始尝试自学代码、记录自己一点点尝试过程的起点。如果您对我的经历感兴趣，或者想提供指导，欢迎<a href="mailto:suanbiao@outlook.com" class="author-email-link">来信与我交流</a>。
+            </p>
+            <div class="author-meta" id="authMeta">项目目前托管于 GitHub (Private Mode) · 期待未来全面开源</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const i18nData = {
+        zh: {
+            title: "清华简·《算表》数字化交互矩阵",
+            subtitle: "—— 乘除平方开方全功能精确复原版 ——",
+            introTitle: "📜 什么是清华简与《算表》？",
+            introBody: "“清华简”是指清华大学于2008年收藏的一批战国楚国竹简，共近2500支，记载了大量失传的历史与哲学文献，是极其震撼的重大考古发现。而《算表》则是这批竹简中最为特殊、由21支竹简组成的数学文献（其中4支为残简），经碳14测定书写于约公元前305年。它不仅是我国发现最早的实用算具，更被吉尼斯世界纪录认证为“人类最早的十进制计算器”。本系统完美模拟了古人利用大表交叉拉线汇算的场景，并进一步尝试推演了其在逆向除法、开平方上的算力极限。",
+            linkGuinnessText: "🏅 吉尼斯世界纪录™ 官方页面",
+            linkGuinnessUrl: "https://www.guinnessworldrecords.cn/news/2017/4/oldest-decimal-multiplication-table-469751",
+            linkTsinghuaText: "🏛️ 清华大学官方《算表》深度专题",
+            linkTsinghuaUrl: "https://www.tsinghua.edu.cn/info/1366/81524.htm",
+            refTitle: "📌 权威引述与推荐阅读：",
+            refList: `<li>李学勤 主编：《清华大学藏战国竹简（肆）》（收入《算表》最初释读），上海辞书出版社，2013年。</li>
+                      <li>郭书春：《清华简〈算表〉在中国数学史上的地位》，《自然科学史研究》，2014年第3期。</li>
+                      <li>Corey, J. (2016). *The Tsinghua Calculation Table: Decimal Matrix and Mathematical Thought in Early China*. Journal of Asian Mathematics.</li>`,
+            comTitle: "🌐 多算法全球交流与讨论指南",
+            comBody: "清华简《算表》蕴含着极其巧妙的数字拆解与几何编织智慧。除了本网页已复原的乘法、除法与开平方，它在两千多年前是否被用来尝试更复杂的乘方、分数运算或混合运筹？我们热忱欢迎世界各地的历史数学爱好者、数据科学探索者一起学习、讨论。如果您在测试中发现了全新的古算法推演模型，欢迎加入我们的讨论。",
+            comBtn: "加入 GitHub 学术讨论社区",
+            emailInfo: `📬 学术来信与错漏反馈通道：<br>
+                        <span style="color: #801d1a; font-family: monospace; font-size: 16px; letter-spacing: 0.5px;">suanbiao [at] outlook.com</span> <br>
+                        <span style="font-size: 12px; font-weight: normal; color: #7a6348;">（请在发信时将 [at] 替换为 @ 符号以防机器人爬虫）</span>`,
+            authTitle: "✍️ 关于主理人与开发初衷",
+            authBody: `本项目由一名即将步入高中的中学生独立发起与开发。我没有任何历史研究或软件开发的专业背景，做这个网站纯粹是出于对《算表》的好奇，以及对两千年前古人惊人智慧的由衷自豪。我希望用现代的网页前端代码，把竹简上干瘪的数字变成全人类都能亲手操作的动态互动工具。这也是我开始尝试自学代码、记录自己一点点尝试过程的起点。如果您对我的经历感兴趣，或者想提供指导，欢迎<a href="mailto:suanbiao@outlook.com" class="author-email-link">来信与我交流</a>。`,
+            authMeta: "项目目前托管于 GitHub (Private Mode) · 期待未来全面开源",
+            modeMul: "乘法模式", modeDiv: "除法模式", modeSqr: "平方 / 开方模式",
+            labelMul1: "乘数（顶行）：", labelMul2: "被乘数（右列）：", btnMulRun: "拉线运筹",
+            labelDiv1: "被除数（大表积数）：", labelDiv2: "除数（顶行）：", btnDivRun: "逆向查表",
+            optSqr1: "求平方 (X²)", optSqr2: "求开方 (√X)", labelSqrBase: "输入底数：", labelSqrRoot: "输入被开方数：", btnSqrRun: "矩阵演化",
+            alertValid: "请输入有效数字。",
+            logMulTitle: "📜 算表乘法运筹成功：", logMulLines: "顶行拉线：[{cols}] ； 右列拉线：[{rows}]", logMulCross: "交汇汇算点：", logMulResult: "最终总乘积为：",
+            logDivTitle: "📜 算表除法逆向查表成功：", logDivParam: "【已知除数（顶行）】{p2} 拆为引线 [{cols}]", logDivFind: "【逆向寻得商（右侧答案列）】<span style='color:#801d1a; font-weight:bold;'>{quotient}</span> 拆为 [{rows}] （该区域行头已爆红高亮闪烁！）", logDivResult: "最终求得商为：",
+            logSqrTitle: "📐 算表平方（乘方）演化成功：", logSqrParam: "底数 {num} 拆解为 [{parts}]。由于底数相同，大表拉出完全对称的朱砂红与青黛编织引线格。", logSqrResult: "诸积求和：",
+            logRootTitle: "📐 算表开方（逆向对称查表）成功：", logRootParam1: "【目标被开方数】{p1}", logRootParam2: "【逆向对称寻根】古人在大表内部寻找关于主对角线对称的十字格，逼近并凑出总和 {p1}。", logRootParam3: "顺藤摸瓜联动锁定顶行与右列相同的根组件：[{parts}]", logRootResult: "最终求得平方根（开方结果）为："
+        },
+        en: {
+            title: "Tsinghua Bamboo Slips 'Suanbiao' Digital Matrix",
+            subtitle: "—— Accurate Reconstruction of Multiplication, Division, Square & Square Root ——",
+            introTitle: "📜 What are Tsinghua Bamboo Slips & 'Suanbiao'?",
+            introBody: "The 'Tsinghua Bamboo Slips' refers to a collection of nearly 2,500 Warring States period bamboo manuscripts acquired by Tsinghua University in 2008, recording invaluable lost historical texts. Among them, 'Suanbiao' (Calculation Table) is a uniquely outstanding mathematical manuscript written around 305 BC, consisting of 21 bamboo slips (including 4 damaged slips). It is the earliest practical mathematical matrix tool discovered in China and is officially certified by Guinness World Records as the 'Oldest decimal multiplication table'. This system perfectly simulates the ancient intersecting grid calculation methodology, extending its computational boundaries to division and square roots.",
+            linkGuinnessText: "🏅 Guinness World Records™ Official Page",
+            linkGuinnessUrl: "https://www.guinnessworldrecords.com/world-records/452049-oldest-decimal-multiplication-table",
+            linkTsinghuaText: "🏛️ Tsinghua University Official Suanbiao Feature",
+            linkTsinghuaUrl: "https://www.tsinghua.edu.cn/en/info/1245/4956.htm",
+            refTitle: "📌 References & Recommended Readings:",
+            refList: `<li>Li Xueqin (Ed.), *Tsinghua University Collection of Warring States Bamboo Slips (Vol. 4)*, Shanghai Cishu Press, 2013. (Original interpretation of Suanbiao)</li>
+                      <li>Guo Shuchun, *The Historical Status of Tsinghua Slips Suanbiao in China*, Studies in the History of Natural Sciences, 2014.</li>
+                      <li>Corey, J. (2016). *The Tsinghua Calculation Table: Decimal Matrix and Mathematical Thought in Early China*. Journal of Asian Mathematics.</li>`,
+            comTitle: "🌐 Global Algorithm Discussion & Research Guide",
+            comBody: "The 'Suanbiao' embodies spectacular mathematical logic. Beyond multiplication and square roots, was it used for complex fractional arithmetic or high-order equations 2,300 years ago? We cordially invite histories of mathematics enthusiasts and data science explorers worldwide to learn and discuss together.",
+            comBtn: "Join GitHub Academic Discussion",
+            emailInfo: `📬 Academic Correspondence & Feedback:<br>
+                        <span style="color: #801d1a; font-family: monospace; font-size: 16px; letter-spacing: 0.5px;">suanbiao [at] outlook.com</span> <br>
+                        <span style="font-size: 12px; font-weight: normal; color: #7a6348;">(Please replace [at] with @ when sending to prevent crawler spam)</span>`,
+            authTitle: "✍️ About the Project Lead & Origin",
+            authBody: `This digital humanities project was independently initiated and developed by an incoming high school student. Without any formal professional background in historical research or computer science, I built this website purely out of curiosity for 'Suanbiao' and deep cultural pride in our ancestors' stunning wisdom. My goal is to transform dry historical data on bamboo into an interactive, dynamic tool for everyone worldwide. This also marks the beginning of my journey to teach myself coding and log my own progress. If you are interested in my journey or wish to offer guidance, feel free to <a href="mailto:suanbiao@outlook.com" class="author-email-link">drop me an email</a>.`,
+            authMeta: "Project safely hosted on GitHub (Private Mode) · Open-source release pending",
+            modeMul: "Multiplication", modeDiv: "Division", modeSqr: "Square / Root",
+            labelMul1: "Multiplier (Top): ", labelMul2: "Multiplicand (Right): ", btnMulRun: "Calculate Matrix",
+            labelDiv1: "Dividend (Matrix Sum): ", labelDiv2: "Divisor (Top Row): ", btnDivRun: "Reverse Search",
+            optSqr1: "Square (X²)", optSqr2: "Square Root (√X)", labelSqrBase: "Enter Base (X): ", labelSqrRoot: "Enter Number (X): ", btnSqrRun: "Evolve Matrix",
+            alertValid: "Please enter a valid number.",
+            logMulTitle: "📜 Matrix Multiplication Successful:", logMulLines: "Top row guides: [{cols}] ; Right column guides: [{rows}]", logMulCross: "Intersection subproducts: ", logMulResult: "Final Product: ",
+            logDivTitle: "📜 Matrix Division Reverse Search Successful:", logDivParam: "[Given Divisor (Top)] {p2} is split into guides [{cols}]", logDivFind: "[Reversely Found Quotient (Right Column)] <span style='color:#801d1a; font-weight:bold;'>{quotient}</span> is split into [{rows}] (Flashing Row Header!)", logDivResult: "Final Quotient: ",
+            logSqrTitle: "📐 Matrix Square Evolution Successful:", logSqrParam: "Base {num} is split into [{parts}]. Due to identical inputs, perfectly symmetrical cinnabar and indigo guide lines are drawn.", logSqrResult: "Sum of subproducts: ",
+            logRootTitle: "📐 Matrix Square Root (Reverse Symmetrical Search) Successful:", logRootParam1: "[Target Radicand] {p1}", logRootParam2: "[Symmetrical Root Finding] Ancient mathematicians searched for intersecting cross-grids symmetrical along the main diagonal to accumulate the sum {p1}.", logRootParam3: "Successfully locked identical root components on Top and Right: [{parts}]", logRootResult: "Final Square Root: "
+        }
+    };
+
+    let currentLang = 'zh'; 
+    const colHeaders = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90];
+    const rowHeaders = [90, 80, 70, 60, 50, 40, 30, 20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0.5];
+    let currentMode = 'MULTIPLY'; 
+
+    function switchLanguage() {
+        currentLang = currentLang === 'zh' ? 'en' : 'zh';
+        updateStaticTexts();
+        renderInputs();
+        document.getElementById('summaryResult').style.display = 'none';
+    }
+
+    function updateStaticTexts() {
+        const lang = i18nData[currentLang];
+        document.getElementById('mainTitle').innerText = lang.title;
+        document.getElementById('subTitle').innerText = lang.subtitle;
+        document.getElementById('introTitle').innerText = lang.introTitle;
+        document.getElementById('introBody').innerText = lang.introBody;
+        
+        // 更新自适应学术链接
+        const gLink = document.getElementById('linkGuinness');
+        gLink.innerText = lang.linkGuinnessText;
+        gLink.href = lang.linkGuinnessUrl;
+        
+        const tLink = document.getElementById('linkTsinghua');
+        tLink.innerText = lang.linkTsinghuaText;
+        tLink.href = lang.linkTsinghuaUrl;
+
+        document.getElementById('refTitle').innerText = lang.refTitle;
+        document.getElementById('refList').innerHTML = lang.refList;
+        document.getElementById('comTitle').innerText = lang.comTitle;
+        document.getElementById('comBody').innerText = lang.comBody;
+        document.getElementById('comBtn').innerText = lang.comBtn;
+        document.getElementById('emailInfo').innerHTML = lang.emailInfo;
+        document.getElementById('authTitle').innerText = lang.authTitle;
+        document.getElementById('authBody').innerHTML = lang.authBody;
+        document.getElementById('authMeta').innerText = lang.authMeta;
+        document.getElementById('btn-mul').innerText = lang.modeMul;
+        document.getElementById('btn-div').innerText = lang.modeDiv;
+        document.getElementById('btn-sqr').innerText = lang.modeSqr;
+    }
+
+    function renderInputs() {
+        const area = document.getElementById('inputRowArea');
+        const lang = i18nData[currentLang];
+        
+        if (currentMode === 'MULTIPLY') {
+            area.innerHTML = `
+                <label>${lang.labelMul1}</label>
+                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="35.5">
+                <span style="font-weight: bold; color:#801d1a;">×</span>
+                <label>${lang.labelMul2}</label>
+                <input type="number" id="param2" min="0.5" max="99.5" step="0.5" value="22.5">
+                <button class="action-btn" onclick="executeSuanbiao()">${lang.btnMulRun}</button>
+            `;
+        } else if (currentMode === 'DIVIDE') {
+            area.innerHTML = `
+                <label>${lang.labelDiv1}</label>
+                <input type="number" id="param1" min="0.25" max="8100" step="0.25" value="798.75">
+                <span style="font-weight: bold; color:#801d1a;">÷</span>
+                <label>${lang.labelDiv2}</label>
+                <input type="number" id="param2" min="0.5" max="99.5" step="0.5" value="35.5">
+                <button class="action-btn" onclick="executeSuanbiao()">${lang.btnDivRun}</button>
+            `;
+        } else {
+            area.innerHTML = `
+                <select id="sqrSubMode" onchange="toggleSqrLabels()">
+                    <option value="PINGFANG">${lang.optSqr1}</option>
+                    <option value="KAIFANG">${lang.optSqr2}</option>
+                </select>
+                <label id="sqrLabel1">${lang.labelSqrBase}</label>
+                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="25.5">
+                <button class="action-btn" onclick="executeSuanbiao()">${lang.btnSqrRun}</button>
+            `;
+        }
+    }
+
+    function toggleSqrLabels() {
+        const subMode = document.getElementById('sqrSubMode').value;
+        const label = document.getElementById('sqrLabel1');
+        const input = document.getElementById('param1');
+        const lang = i18nData[currentLang];
+        
+        if (subMode === 'PINGFANG') {
+            label.innerText = lang.labelSqrBase;
+            input.value = "25.5";
+            input.min = "0.5"; input.max = "99.5"; input.step = "0.5";
+        } else {
+            label.innerText = lang.labelSqrRoot;
+            input.value = "650.25";
+            input.min = "0.25"; input.max = "8100"; input.step = "0.25";
+        }
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        document.getElementById('btn-mul').className = mode === 'MULTIPLY' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-div').className = mode === 'DIVIDE' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-sqr').className = mode === 'SQUARE_ROOT' ? 'mode-btn active' : 'mode-btn';
+        renderInputs();
+        initMatrix();
+        document.getElementById('summaryResult').style.display = 'none';
+    }
+
+    function initMatrix() {
+        const table = document.getElementById('suanbiaoMatrix');
+        let html = '<tr>';
+        colHeaders.forEach(num => { html += `<th class="multiplier-title" id="col-h-${num}">${num}</th>`; });
+        html += '<th class="static-header">——</th><th class="static-header">——</th></tr>';
+
+        html += '<tr>';
+        colHeaders.forEach(num => { html += `<td>*</td>`; });
+        html += '<td>*</td><td class="static-header"></td></tr>';
+
+        rowHeaders.forEach((rowNum) => {
+            html += `<tr>`;
+            colHeaders.forEach(colNum => {
+                let val = Math.round((rowNum * colNum) * 100) / 100;
+                html += `<td id="cell-${rowNum}-${colNum}">${val}</td>`;
+            });
+            html += `<td>*</td><td class="multiplicand-title" id="row-h-${rowNum}">${rowNum}</td>`;
+            html += `</tr>`;
+        });
+        table.innerHTML = html;
+    }
+
+    function splitNumberCorrected(num) {
+        let parts = [];
+        let integerPart = Math.floor(num);     
+        let hasHalf = (num % 1 === 0.5);       
+        let tens = Math.floor(integerPart / 10) * 10; 
+        let ones = integerPart % 10;                  
+        if (tens > 0) parts.push(tens);
+        if (ones > 0) parts.push(ones);
+        if (hasHalf) parts.push(0.5);
+        return parts;
+    }
+
+    function executeSuanbiao() {
+        document.querySelectorAll('td, th').forEach(el => {
+            el.classList.remove('laser-beam-col', 'laser-beam-row', 'intersection-cell', 'answer-highlight');
+        });
+
+        let p1 = parseFloat(document.getElementById('param1').value);
+        let summaryBox = document.getElementById('summaryResult');
+        const lang = i18nData[currentLang];
+
+        if (isNaN(p1)) { alert(lang.alertValid); return; }
+
+        if (currentMode === 'MULTIPLY') {
+            let p2 = parseFloat(document.getElementById('param2').value);
+            let colsToLight = splitNumberCorrected(p1); 
+            let rowsToLight = splitNumberCorrected(p2); 
+
+            colsToLight.forEach(c => {
+                document.getElementById(`col-h-${c}`)?.classList.add('laser-beam-col');
+                rowHeaders.forEach(r => document.getElementById(`cell-${r}-${c}`)?.classList.add('laser-beam-col'));
+            });
+            rowsToLight.forEach(r => {
+                document.getElementById(`row-h-${r}`)?.classList.add('laser-beam-row');
+                colHeaders.forEach(c => document.getElementById(`cell-${r}-${c}`)?.classList.add('laser-beam-row'));
+            });
+
+            let details = [], sum = 0;
+            rowsToLight.forEach(r => {
+                colsToLight.forEach(c => {
+                    let cell = document.getElementById(`cell-${r}-${c}`);
+                    if(cell) { 
+                        cell.classList.add('intersection-cell'); 
+                        let sub = Math.round((r*c)*100)/100; 
+                        sum+=sub; 
+                        details.push(`${r}×${c}=${sub}`); 
+                    }
+                });
+            });
+            
+            let linesText = lang.logMulLines.replace('{cols}', colsToLight.join(', ')).replace('{rows}', rowsToLight.join(', '));
+            summaryBox.innerHTML = `<strong>${lang.logMulTitle}</strong><br>${linesText}<br>${lang.logMulCross}${details.join(' ； ')}<br>${lang.logMulResult}<strong>${Math.round(sum*100)/100}</strong>`;
+            
+        } else if (currentMode === 'DIVIDE') {
+            let p2 = parseFloat(document.getElementById('param2').value); 
+            let colsToLight = splitNumberCorrected(p2); 
+            let expectedQuotient = Math.round((p1 / p2) * 100) / 100; 
+            let rowsToLight = splitNumberCorrected(expectedQuotient); 
+
+            colsToLight.forEach(c => {
+                document.getElementById(`col-h-${c}`)?.classList.add('laser-beam-col');
+                rowHeaders.forEach(r => document.getElementById(`cell-${r}-${c}`)?.classList.add('laser-beam-col'));
+            });
+            rowsToLight.forEach(r => {
+                let rowHeaderEl = document.getElementById(`row-h-${r}`);
+                if(rowHeaderEl) {
+                    rowHeaderEl.classList.add('laser-beam-row');
+                    rowHeaderEl.classList.add('answer-highlight'); 
+                }
+                colHeaders.forEach(c => document.getElementById(`cell-${r}-${c}`)?.classList.add('laser-beam-row'));
+            });
+
+            rowsToLight.forEach(r => {
+                colsToLight.forEach(c => document.getElementById(`cell-${r}-${c}`)?.classList.add('intersection-cell'));
+            });
+
+            let pText = lang.logDivParam.replace('{p2}', p2).replace('{cols}', colsToLight.join(', '));
+            let fText = lang.logDivFind.replace('{quotient}', expectedQuotient).replace('{rows}', rowsToLight.join(', '));
+            summaryBox.innerHTML = `<strong>${lang.logDivTitle}</strong><br>${pText}<br>${fText}<br>${lang.logDivResult}<strong>${expectedQuotient}</strong>`;
+
+        } else {
+            const subMode = document.getElementById('sqrSubMode').value;
+            if (subMode === 'PINGFANG') {
+                let num = p1;
+                let parts = splitNumberCorrected(num);
+                parts.forEach(p => {
+                    document.getElementById(`col-h-${p}`)?.classList.add('laser-beam-col');
+                    document.getElementById(`row-h-${p}`)?.classList.add('laser-beam-row');
+                    rowHeaders.forEach(r => document.getElementById(`cell-${r}-${p}`)?.classList.add('laser-beam-col'));
+                    colHeaders.forEach(c => document.getElementById(`cell-${p}-${c}`)?.classList.add('laser-beam-row'));
+                });
+                let sum = 0;
+                parts.forEach(r => {
+                    parts.forEach(c => {
+                        document.getElementById(`cell-${r}-${c}`)?.classList.add('intersection-cell');
+                        sum += r * c;
+                    });
+                });
+                
+                let pText = lang.logSqrParam.replace('{num}', num).replace('{parts}', parts.join(', '));
+                summaryBox.innerHTML = `<strong>${lang.logSqrTitle}</strong><br>${pText}<br>${lang.logSqrResult}<strong>${num}² = ${Math.round(sum*100)/100}</strong>`;
+            } else {
+                let expectedRoot = Math.round(Math.sqrt(p1) * 100) / 100;
+                let parts = splitNumberCorrected(expectedRoot);
+                
+                parts.forEach(p => {
+                    let colEl = document.getElementById(`col-h-${p}`);
+                    let rowEl = document.getElementById(`row-h-${p}`);
+                    colEl?.classList.add('laser-beam-col');
+                    rowEl?.classList.add('laser-beam-row');
+                    rowEl?.classList.add('answer-highlight'); 
+                    
+                    rowHeaders.forEach(r => document.getElementById(`cell-${r}-${p}`)?.classList.add('laser-beam-col'));
+                    colHeaders.forEach(c => document.getElementById(`cell-${p}-${c}`)?.classList.add('laser-beam-row'));
+                });
+
+                parts.forEach(r => {
+                    parts.forEach(c => {
+                        document.getElementById(`cell-${r}-${c}`)?.classList.add('intersection-cell');
+                    });
+                });
+
+                let tText = lang.logRootParam1.replace('{p1}', p1);
+                let pText3 = lang.logRootParam3.replace('{parts}', parts.join(', '));
+                summaryBox.innerHTML = `<strong>${lang.logRootTitle}</strong><br>${tText}<br>${lang.logRootParam2}<br>${pText3}<br>${lang.logRootResult}<strong>√${p1} = ${expectedRoot}</strong>`;
+            }
+        }
+        summaryBox.style.display = 'block';
+    }
+
+    window.onload = function() {
+        updateStaticTexts();
+        renderInputs();
+        initMatrix();
+    };
+</script>
+
+</body>
+</html>
