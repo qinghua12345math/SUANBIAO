@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>清华简·《算表》数字化古风交互矩阵 V27</title>
+    <title>清华简·《算表》数字化古风交互矩阵 V2.2</title>
     <style>
         body {
             font-family: "Xingkai SC", "Kaiti SC", "STKaiti", "华文楷体", serif;
@@ -34,7 +34,7 @@
         }
         
         .lang-switch-container { position: absolute; top: 15px; right: 25px; }
-        .lang-btn { padding: 4px 14px; font-family: inherit; font-size: 13px; background: #cdaf77; border: 1px solid #917543; color: #3e2b1c; cursor: pointer; font-weight: bold; }
+        .lang-btn { padding: 4px 14px; font-family: inherit; font-size: 13px; background: #cdaf77; border: 1px solid #917543; color: #3e2b1c; cursor: pointer; font-weight: bold; border-radius: 2px; }
         .lang-btn:hover { background: #801d1a; color: #fffdec; }
 
         h1 { text-align: center; color: #801d1a; margin: 0 0 2px 0; font-size: 26px; letter-spacing: 4px; }
@@ -56,7 +56,7 @@
         .link-badge:hover { background: #801d1a; color: #fffdec; border-color: #5c110f; }
         .reference-list { font-size: 13px; color: #5c4731; padding-left: 18px; margin: 4px 0 0 0; }
 
-        /* 控制面板优化 */
+        /* 控制面板 */
         .control-panel { background: #d4c299; padding: 10px 20px; border-radius: 4px; border: 1px solid #aa9671; margin-bottom: 10px; }
         .input-row { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 16px; flex-wrap: wrap; }
         input, select { padding: 5px 10px; font-size: 15px; border: 1px solid #917543; background: #f7f1e1; color: #2c1d11; text-align: center; font-family: inherit; font-weight: bold; }
@@ -64,26 +64,51 @@
         .action-btn { padding: 6px 25px; font-size: 16px; font-family: inherit; background-color: #801d1a; color: #fffdec; border: none; cursor: pointer; font-weight: bold; border-radius: 2px; transition: background 0.2s; }
         .action-btn:hover { background-color: #9c2824; }
 
-        /* 矩阵表格自适应 */
-        .table-wrapper { width: 100%; border: 3px solid #5c3f23; background: #ebdcb9; margin-bottom: 12px; box-sizing: border-box; }
-        table { border-collapse: collapse; width: 100%; font-size: 12px; table-layout: fixed; }
+        /* 快捷按钮样式 */
+        .example-btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .ex-btn { padding: 5px 10px; font-size: 12px; background: #dfd3b6; border: 1px solid #aa9671; color: #5c3f23; cursor: pointer; border-radius: 3px; font-family: inherit; font-weight: bold; transition: all 0.2s; }
+        .ex-btn:hover { background: #801d1a; color: #fffdec; border-color: #801d1a; }
+
+        /* 居中高亮中央弹窗系统 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(44, 29, 17, 0.6); z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: #ebdcb9; width: 90%; max-width: 650px;
+            padding: 25px; border-radius: 6px; border: 4px double #5c3f23;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 30px rgba(92,63,35,0.2);
+            position: relative; animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-header { color: #801d1a; font-size: 18px; font-weight: bold; border-bottom: 2px dashed #917543; padding-bottom: 6px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .modal-close-btn { background: #801d1a; color: #fffdec; border: none; padding: 4px 12px; font-size: 13px; font-family: inherit; cursor: pointer; border-radius: 2px; font-weight: bold; }
+        .modal-close-btn:hover { background: #9c2824; }
+        .countdown-tip { font-size: 12px; color: #8a7355; font-style: italic; }
+
+        /* 算表上方的运筹讲解展示框（常驻） */
+        .summary-box { background: #ebdcb9; padding: 15px; border-radius: 2px; border: 1px solid #aa9671; border-left: 6px solid #801d1a; line-height: 1.6; font-size: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px; }
+
+        /* 矩阵表格 */
+        .table-wrapper { width: 100%; border: 3px solid #5c3f23; background: #ebdcb9; margin-bottom: 12px; box-sizing: border-box; overflow-x: auto; }
+        table { border-collapse: collapse; width: 100%; font-size: 12px; table-layout: fixed; min-width: 800px; }
         th, td { border-left: 1px solid #5c3f23; border-right: 1px solid #5c3f23; border-top: 1px solid #d4c299; border-bottom: 1px solid #d4c299; padding: 4px 0; text-align: center; background: #ebdcb9; transition: background 0.4s ease, color 0.4s ease; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         
         .multiplier-title { background: linear-gradient(90deg, #d2a479 0%, #e8be99 50%, #d2a479 100%) !important; color: #2c1d11 !important; font-weight: bold; }
         .multiplicand-title { background: linear-gradient(90deg, #c58d5b 0%, #dba779 50%, #c58d5b 100%) !important; color: #fffdec !important; font-weight: bold; }
         .static-header { background: #d4c299; color: #4a341e; font-weight: bold; }
 
-        /* 动态拉线动画 */
-        .laser-beam-col { background-color: rgba(166,40,36,0.35) !important; transition: background-color 0.15s ease; }
-        .laser-beam-row { background-color: rgba(34,112,93,0.3) !important; transition: background-color 0.15s ease; }
-        
+        /* 拉线动画与高亮 */
+        .laser-beam-col { background-color: rgba(166,40,36,0.35) !important; }
+        .laser-beam-row { background-color: rgba(34,112,93,0.3) !important; }
         .laser-beam-col.laser-beam-row { background-color: rgba(140,50,40,0.5) !important; }
         .intersection-cell { background: radial-gradient(circle, #ff4d4d 20%, #801d1a 90%) !important; color: #fffdec !important; font-weight: bold; font-size: 13px; animation: superPulse 0.4s infinite alternate; }
         .answer-highlight { background: linear-gradient(90deg, #9c2824 0%, #ff4d4d 50%, #9c2824 100%) !important; color: white !important; font-weight: bold; box-shadow: 0 0 6px #801d1a; animation: superPulse 0.4s infinite alternate; }
         
         @keyframes superPulse { from { filter: brightness(0.9) scale(0.98); } to { filter: brightness(1.3) scale(1.02); } }
-
-        .summary-box { background: #ebdcb9; padding: 10px 15px; border-radius: 2px; border: 1px solid #aa9671; border-left: 6px solid #801d1a; line-height: 1.6; font-size: 14px; width: 100%; box-sizing: border-box; margin-bottom: 12px; }
 
         .footer-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 2px double #5c3f23; padding-top: 12px; }
         .footer-card { background: #f2e6cc; border: 1px solid #c5b593; padding: 12px 18px; border-radius: 4px; line-height: 1.5; font-size: 13px; }
@@ -96,6 +121,19 @@
     </style>
 </head>
 <body>
+
+<div class="modal-overlay" id="centerModalOverlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="modalTitle">📜 算表运筹推演成功</span>
+            <span class="countdown-tip" id="modalCountdown">(10s后自动关闭)</span>
+        </div>
+        <div id="modalBody" style="font-size: 14px; line-height: 1.6; color: #2c1d11;"></div>
+        <div style="text-align: right; margin-top: 15px;">
+            <button class="modal-close-btn" onclick="closeCenterModal()" id="modalCloseBtn">知晓 / Close</button>
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <div class="lang-switch-container">
@@ -122,21 +160,22 @@
     </div>
 
     <div class="theory-section">
-        <h3 id="theoryTitle">📐 算表物理算力与位值制逻辑 / Physical Scale & Positional Logic</h3>
+        <h3 id="theoryTitle">📐 算表物理算力与位值制逻辑</h3>
         <p id="theoryBody">
             作为数字化精确复原版，本交互矩阵严格遵循两千年前文物的真实物理极限。
-            <br><b>① 物理天花板 [0.5 - 99.5]</b>：《算表》的行列固定表头由“十位系列(90-10)”、“个位系列(9-1)”及“半数(0.5)”组成。乘法与求平方模式下，输入的因子不得大于 99.5 且小数部分必须是 0 或 5（即只支持整数或半数组件拆解），超出或不符者将触发极限防御弹窗。
-            <br><b>② 位值制拆解规则与极限支持</b>：战国楚人已完美掌握“十进制位值制”。为了保护大表核心矩阵并支持高阶计算，除法与开方的输入上限统一提升并锁死在 <b>9900.25</b>（即大表终极理论上限 99.5X 99.5）。<b>在除法与开方模式中，只要输入数字不大于 9900.25，系统即全面支持运算。若最终计算得出的只是近似值（如除不尽的无限循环小数、非完全平方数开方等），本数字化系统将自动为您保留三位小数</b>，以便用现代科学视角评估历史算力。
+            <br><b>① 物理天花板 [0.5 - 99.5]</b>：《算表》的行列固定表头由“十位系列(90-10)”、“个位系列(9-1)”及“半数(0.5)”组成。乘法与求平方模式下，输入的因子不得大于 99.5 且小数部分必须是 0 或 5（即只支持整数或半数组件拆解）。
+            <br><b>② 位值制拆解规则与极限支持</b>：战国楚人已完美掌握“十进制位值制”。为了保护大表核心矩阵并支持高阶计算，除法与开方的输入上限统一提升并锁死在 <b>9900.25</b>（即大表终极理论上限 99.5×99.5）。在除法与开方模式中，只要输入数字不大于 9900.25，系统即全面支持运算。若最终计算得出的只是近似值，本系统将自动为您保留三位小数。
         </p>
     </div>
 
-    <div class="guide-section">
-        <h3 id="guideTitle">🧭 《算表》运筹操作指南 / How to Use the Matrix</h3>
-        <p id="guideBody">
-            古人使用《算表》时，会利用竹简上的丝线进行交叉定位。
-            <br><b>1. 乘法与平方</b>：在顶部横轴和右侧纵轴找到要计算的数字（若有十位和个位，则拆开看），从对应的表头分别向下拉出纵向和横向引线。引线在内部交汇处的数字之和，即为最终结果。
-            <br><b>2. 除法与开方</b>：除法是乘法的逆运算。已知除数（顶行）和被除数（大表总和），在对应的纵向光轴区域内，逆向凑出等于被除数（或按大表量程等比压缩）的格子组合，其横向联动锁定的右列数字即为商。
-        </p>
+    <div class="guide-section" style="border-left: 6px solid #801d1a; background: #ebdcb9;">
+        <h3 id="exampleTitle">💡 新手速成！挑选一个实例一键体验古人四则运算智慧</h3>
+        <div class="example-btn-group">
+            <button class="ex-btn" id="exBtn1" onclick="quickExample('MULTIPLY', 23, 18)">✖️ 乘法：23 × 18 (分配律拆解)</button>
+            <button class="ex-btn" id="exBtn2" onclick="quickExample('DIVIDE', 45, 15)">➗ 除法：45 ÷ 15 (逆向查表凑数法)</button>
+            <button class="ex-btn" id="exBtn3" onclick="quickExample('SQUARE', 12.5)">📐 平方：12.5² (全对称朱青双色拉线)</button>
+            <button class="ex-btn" id="exBtn4" onclick="quickExample('SQRT', 225)">🔍 开方：√225 (对角线十字寻根法)</button>
+        </div>
     </div>
 
     <div class="control-panel">
@@ -186,51 +225,80 @@
             introTitle: "📜 什么是清华简与《算表》？",
             introBody: "“清华简”是指清华大学于2008年收藏的一批战国楚国竹简，共近2500支。而《算表》则是这批竹简中最为特殊、由21支竹简组成的数学文献，经碳14测定书写于约公元前305年。它不仅是我国发现最早的实用算具，更被吉尼斯世界纪录认证为“人类最早的十进制计算器”。",
             theoryTitle: "📐 算表物理算力与位值制逻辑",
-            theoryBody: "作为数字化精确复原版，本交互矩阵严格遵循两千年前文物的真实物理极限。<br><b>① 物理天花板 [0.5 - 99.5]</b>：《算表》的行列固定表头由“十位系列(90-10)”、“个位系列(9-1)”及“半数(0.5)”组成。乘法与求平方模式下，输入的因子不得大于 99.5 且小数部分必须是 0 或 5（即只支持整数或半数组件拆解），超出或不符者将触发极限防御弹窗。<br><b>② 位值制拆解规则与极限支持</b>：战国楚人已完美掌握“十进制位值制”。为了保护大表核心矩阵并支持高阶计算，除法与开方的输入上限统一提升并锁死在 <b>9900.25</b>（即大表终极理论上限 99.5X 99.5）。<b>在除法与开方模式中，只要输入数字不大于 9900.25，系统即全面支持运算。若最终计算得出的只是近似值（如除不尽的无限循环小数、非完全平方数开方等），本数字化系统将自动为您保留三位小数</b>，以便用现代科学视角评估历史算力。",
-            guideTitle: "🧭 《算表》运筹操作指南",
-            guideBody: "古人使用《算表》时，会利用竹简上的丝线进行交叉定位。<br><b>1. 乘法与平方</b>：在顶部横轴和右侧纵轴找到要计算的数字（若有分数或十位则拆开），从对应的表头分别向下拉出纵向和横向引线。引线在内部交汇处的数字之和，即为最终结果。<br><b>2. 除法与开方</b>：除法是乘法的逆运算。已知除数（顶行）和被除数（大表总和），在对应的纵向光轴区域内，逆向凑出等于被除数（或按大表量程等比压缩）的格子组合，其横向联动锁定的右列数字即为商。",
+            theoryBody: "作为数字化精确复原版，本交互矩阵严格遵循两千年前文物的真实物理极限。<br><b>① 物理天花板 [0.5 - 99.5]</b>：《算表》的行列固定表头由“十位系列(90-10)”、“个位系列(9-1)”及“半数(0.5)”组成。乘法与求平方模式下，输入的因子不得大于 99.5 且小数部分必须是 0 或 5（即只支持整数或半数组件拆解）。<br><b>② 位值制拆解规则与极限支持</b>：战国楚人已完美掌握“十进制位值制”。为了保护大表核心矩阵并支持高阶计算，除法与开方的输入上限统一提升并锁死在 <b>9900.25</b>。在除法与开方模式中，只要输入数字不大于 9900.25，系统即全面支持运算。若最终计算得出的只是近似值，本系统将自动为您保留三位小数。",
+            exampleTitle: "💡 新手速成！挑选一个实例一键体验古人四则运算智慧",
+            exBtn1: "✖️ 乘法：23 × 18 (分配律拆解)",
+            exBtn2: "➗ 除法：45 ÷ 15 (逆向查表凑数法)",
+            exBtn3: "📐 平方：12.5² (全对称朱青双色拉线)",
+            exBtn4: "🔍 开方：√225 (对角线十字寻根法)",
             comTitle: "🌐 交流与讨论",
-            comBody: "清华简《算表》蕴含中国古人巧思善算、推究数理的智慧，欢迎世界各地的历史数学爱好者、数据科学探索者一起学习、讨论。",
+            comBody: "清华简《算表》蕴含中国古人巧思善算、推究数理的智慧，欢迎世界各地的数学爱好者、数据科学探索者一起学习、讨论。",
             comBtn: "加入 GitHub 讨论社区",
             authTitle: "✍️ 关于本站",
             authBody: "我是一名中学生，做这个网站纯粹是出于对《算表》的好奇，以及对两千年前古人惊人智慧的由衷自豪。我希望用现代的网页前端代码，把竹简上模糊的文字变成大家都能亲手操作的动态互动工具。",
             authMeta: '欢迎来信与我交流：<a href="mailto:suanbiao@outlook.com" class="mail-link">suanbiao@outlook.com</a>',
             btnRunText: "拉线运筹", alertValid: "请输入有效数字！",
-            alertLimit: "⚠️【算表因子物理超限拦截】\n输入的数字大于99.5，或者该数字的小数部分不是0或5！这是因为《算表》单因子物理拉线无法跨越 99.5 且不具备其他精度的物理刻度！",
-            alertDivLimit: "⚠️【除法算力超限拦截】\n被除数与除数均不得大于 9900.25！在这个范围内的均支持运算。",
-            alertSqrtLimit: "⚠️【开方大表超限拦截】\n输入的开方目标数字不得大于 9900.25！超出此范围将溢出大表的最大物理算力上限。",
-            logMulTitle: "📜 算表乘法运筹成功：", logMulLines: "顶行拉线：[{cols}] ； 右列拉线：[{rows}]", logMulCross: "交汇汇算点：", logMulResult: "最终总乘积为：",
-            logDivTitle: "📜 算表除法逆向求值成功（已自动保留3位小数）：", logDivParam: "【已知除数（顶行）】{p2} 拆为引线 [{cols}]", logDivFind: "【逆向联动商（右侧答案列）】<span style='color:#801d1a; font-weight:bold;'>{quotient}</span> 映射拆为 [{rows}]", logDivResult: "最终求得商为：",
-            logSqrTitle: "📐 算表平方（乘方）演化成功：", logSqrParam: "底数 {num} 拆解为 [{parts}]。由于底数相同，大表拉出完全对称的朱砂红与青黛编织引线格。", logSqrResult: "诸积求和：",
-            logRootTitle: "📐 算表开方（逆向对称查表成功，已自动保留3位小数）：", logRootParam1: "【目标被开方数】{p1}", logRootParam2: "【逆向对称寻根】古人在大表内部寻找关于主对角线对称的十字格，逼近并凑出总和 {p1}。", logRootParam3: "顺藤摸瓜联动锁定顶行与右列相同的根组件：[{parts}]", logRootResult: "最终求得平方根（开方结果）为："
+            alertLimit: "⚠️【算表因子物理超限拦截】\n输入的数字大于99.5，或者该数字的小数部分不是0或5！",
+            alertDivLimit: "⚠️【除法算力超限拦截】\n被除数与除数均不得大于 9900.25！",
+            alertSqrtLimit: "⚠️【开方大表超限拦截】\n输入的开方目标数字不得大于 9900.25！",
+            modalHeadText: "📜 算表运筹推演成功",
+            modalClose: "知晓 / Close",
+            countdownTip: "({time}s 后自动关闭)",
+            logMulLines: "💡 <b>拉线拆解：</b> 顶行（乘数）拆为 [ {cols} ]，右列（被乘数）拆为 [ {rows} ]。交叉格子即为各个分量积。",
+            logMulResult: "🎉 最终相乘之积：",
+            logDivParam: "💡 <b>除法逆向逻辑：</b> 已知除数为 <b>{p2}</b>，在算表顶行将其分拆为 [ {cols} ] 的多列组合。",
+            logDivFind: "<b>寻根运筹：</b> 正在矩阵中沿此两列纵向搜寻，寻找哪一行对应的交点数字相加刚好等于被除数。最终成功定位到右侧表头的行组合为 [ {rows} ]！",
+            divExplanation: "<b style='color:#801d1a;'>💡 楚国人如何理解除法？</b><br>除法是乘法的逆运算。以 $45 \\div 15$ 为例，除数 15 被拆为 [10 + 5]，我们在它们正下方的区域内寻找处于同一水平横线上的数字，发现当锁定第“3”行时，对应的交叉格子正好是 30 和 15，两者相加刚好等于 45 ($30+15=45$)！所以，右侧表头牵引出来的答案就是 <b>3</b>。",
+            logDivResult: "🎉 逆向求商结果：",
+            logSqrParam: "💡 <b>完全对称求平方：</b> 底数 <b>{num}</b> 在横纵双轴均被拆解为 [ {parts} ]，矩阵将呈现完美的正方形对称高亮区。",
+            logSqrResult: "🎉 平方运算结果：",
+            logRootParam1: "💡 <b>对角线十字寻根法：</b> 目标开方数为 <b>{p1}</b>。",
+            logRootParam2: "<b>运筹方法：</b> 沿着大表的正对角线进行双向延伸，寻找一个基准点，使其对应横纵轴对称拆解后的总面积（包含对角线本身和两侧辐射区）最逼近目标值。",
+            logRootParam3: "经精密迭代，最终成功在对角线核心区收敛锁定表头组件：[ {parts} ]。",
+            logRootResult: "🎉 算表开方估计值："
         },
         en: {
             title: "Tsinghua Bamboo Slips 'Suanbiao' Digital Matrix",
             subtitle: "Intersecting Threads of Ancient Numbers",
             introTitle: "📜 What are Tsinghua Bamboo Slips & 'Suanbiao'?",
-            introBody: "The 'Tsinghua Bamboo Slips' refers to a collection of Warring States period manuscripts acquired by Tsinghua University in 2008. Among them, 'Suanbiao' is a unique mathematical text written around 305 BC, consisting of 21 slips. It is certified by Guinness World Records as the 'Oldest decimal multiplication table'.",
+            introBody: "The 'Tsinghua Bamboo Slips' refers to a collection of Warring States period manuscripts acquired by Tsinghua University in 2008. Among them, 'Suanbiao' is certified by Guinness World Records as the 'Oldest decimal multiplication table'.",
             theoryTitle: "📐 Physical Scale & Positional Logic",
-            theoryBody: "As a precise digital reconstruction, this interactive matrix strictly obeys the physical limits of the 2,300-year-old artifact.<br><b>① Physical Ceiling [0.5 - 99.5]</b>: Under Multiplication and Square mode, inputs must not exceed 99.5, and the decimal part must be .0 or .5. Otherwise, an overlimit intercept popup will be triggered.<br><b>② Place-Value Architecture & High-Scale Bounds</b>: Ancient mathematicians applied a strict decimal place-value logic. To secure advanced calculations, inputs for Division and Square Roots are strictly capped at <b>9900.25</b> (99.5 X 99.5). <b>In division and square root modes, any inputs below or equal to 9900.25 are fully supported. If the calculation yields an approximate value (like non-terminating fractions), the system will automatically round the output to 3 decimal places</b>.",
-            guideTitle: "🧭 How to Use the Matrix",
-            guideBody: "Ancient practitioners used vermilion threads drawn across the bamboo matrix for lookup.<br><b>1. Multiplication & Square</b>: Decompose numbers into base units on top and right headers, project intersecting columns and rows. The sum of all values inside the intersected cross-grids yields the final answer.<br><b>2. Division & Square Root</b>: Reverse-engineered tracking. For division, locate the column area of the divisor (top), look inside the matrix to aggregate grids summing up to the dividend, then find the corresponding quotient elements locked on the rightmost column.",
+            theoryBody: "As a precise digital reconstruction, this interactive matrix strictly obeys the physical limits of the 2,300-year-old artifact.<br><b>① Physical Ceiling [0.5 - 99.5]</b>: Factors under multiplication/square must not exceed 99.5 and must end in .0 or .5.<br><b>② High-Scale Bounds</b>: Division and Square Root operations support values up to <b>9900.25</b>. Infinite decimals or approximations will automatically round to 3 decimal places.",
+            exampleTitle: "💡 Quick Start! Choose an instance to experience ancient calculation wisdom",
+            exBtn1: "✖️ Multi: 23 × 18 (Place-value Decomp)",
+            exBtn2: "➗ Division: 45 ÷ 15 (Reverse Lookup)",
+            exBtn3: "📐 Square: 12.5² (Symmetrical Rendering)",
+            exBtn4: "🔍 Sqrt: √225 (Diagonal Cross Finding)",
             comTitle: "🌐 Discussion & Research Guide",
-            comBody: "The Suanbiao embodies spectacular mathematical logic. We cordially invite mathematics enthusiasts and data science explorers worldwide to learn and discuss together.",
+            comBody: "The Suanbiao embodies spectacular mathematical logic. We cordially invite mathematics enthusiasts and data science explorers worldwide to discuss together.",
             comBtn: "Join GitHub Discussion",
             authTitle: "✍️ About the Project Lead & Origin",
-            authBody: "This digital humanities project was independently initiated and developed by a school student. Built purely out of curiosity for Suanbiao and deep cultural pride in our ancestors' stunning wisdom.",
+            authBody: "This digital humanities project was independently initiated and developed by a school student.",
             authMeta: 'Welcome to contact me: <a href="mailto:suanbiao@outlook.com" class="mail-link">suanbiao@outlook.com</a>',
             btnRunText: "Calculate Matrix", alertValid: "Please enter a valid number!",
-            alertLimit: "⚠️ [Factor Overlimit Warning]\nInput factor is greater than 99.5 or its decimal part is not .0 or .5. The original physical bamboo sticks do not have markings for other fractions!",
-            alertDivLimit: "⚠️ [Division Bounds Error]\nBoth dividend and divisor must not exceed 9900.25! Calculations within this scope are fully supported.",
-            alertSqrtLimit: "⚠️ [Square Root Limit Warning]\nThe radicand must not exceed 9900.25 to prevent overflowing the boundaries of the matrix grid.",
-            logMulTitle: "📜 Matrix Multiplication Successful:", logMulLines: "Top row guides: [{cols}] ; Right column guides: [{rows}]", logMulCross: "Intersection subproducts: ", logMulResult: "Final Product: ",
-            logDivTitle: "📜 Matrix Division Successful (Rounded to 3 decimal places):", logDivParam: "[Given Divisor (Top)] {p2} is split into guides [{cols}]", logDivFind: "[Reversely Found Quotient (Right Column)] <span style='color:#801d1a; font-weight:bold;'>{quotient}</span> is split into [{rows}]", logDivResult: "Final Quotient: ",
-            logSqrTitle: "📐 Matrix Square Evolution Successful:", logSqrParam: "Base {num} is split into [{parts}]. Due to identical inputs, perfectly symmetrical cinnabar and indigo guide lines are drawn.", logSqrResult: "Sum of subproducts: ",
-            logRootTitle: "📐 Matrix Square Root Successful (Rounded to 3 decimal places):", logRootParam1: "[Target Radicand] {p1}", logRootParam2: "[Symmetrical Root Finding] Ancient mathematicians searched for intersecting cross-grids symmetrical along the main diagonal to accumulate the sum {p1}.", logRootRoot3: "Successfully locked identical root components on Top and Right: [{parts}]", logRootResult: "Final Square Root: "
+            alertLimit: "⚠️ [Factor Overlimit Warning]\nInput factor is greater than 99.5 or its decimal part is not .0 or .5.",
+            alertDivLimit: "⚠️ [Division Bounds Error]\nBoth dividend and divisor must not exceed 9900.25!",
+            alertSqrtLimit: "⚠️ [Square Root Limit Warning]\nThe radicand must not exceed 9900.25.",
+            modalHeadText: "📜 Matrix Calculation Complete",
+            modalClose: "Close",
+            countdownTip: "(Auto closes in {time}s)",
+            logMulLines: "💡 <b>Line Decomposing:</b> Top header (Multiplier) split into [ {cols} ], Right header (Multiplicand) split into [ {rows} ]... ",
+            logMulResult: "🎉 Final Product Result: ",
+            logDivParam: "💡 <b>Reverse Division Logic:</b> Divisor is <b>{p2}</b>, split into [ {cols} ].",
+            logDivFind: "<b>Matrix Scanning:</b> Scanning rows to match the dividend... Row components: [ {rows} ].",
+            divExplanation: "Division is treated as the inverse of multiplication...",
+            logDivResult: "🎉 Calculated Quotient: ",
+            logSqrParam: "💡  <b>Symmetrical Squaring:</b> Base <b>{num}</b> split into [ {parts} ]...",
+            logSqrResult: "🎉 Final Square Result: ",
+            logRootParam1: "💡 <b>Diagonal Cross-Finding:</b> Target radicand is <b>{p1}</b>.",
+            logRootParam2: "<b>Method:</b> Diagonal path matching...",
+            logRootParam3: "Stabilized at: [ {parts} ].",
+            logRootResult: "🎉 Approximated Square Root: "
         }
     };
 
     let currentLang = 'zh'; 
+    let modalTimer = null;
     const colHeaders = [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 30, 40, 50, 60, 70, 80, 90];
     const rowHeaders = [90, 80, 70, 60, 50, 40, 30, 20, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0.5];
 
@@ -243,8 +311,11 @@
         document.getElementById('introBody').innerText = lang.introBody;
         document.getElementById('theoryTitle').innerText = lang.theoryTitle;
         document.getElementById('theoryBody').innerHTML = lang.theoryBody;
-        document.getElementById('guideTitle').innerText = lang.guideTitle;
-        document.getElementById('guideBody').innerHTML = lang.guideBody;
+        document.getElementById('exampleTitle').innerText = lang.exampleTitle;
+        document.getElementById('exBtn1').innerText = lang.exBtn1;
+        document.getElementById('exBtn2').innerText = lang.exBtn2;
+        document.getElementById('exBtn3').innerText = lang.exBtn3;
+        document.getElementById('exBtn4').innerText = lang.exBtn4;
         document.getElementById('comTitle').innerText = lang.comTitle;
         document.getElementById('comBody').innerText = lang.comBody;
         document.getElementById('comBtn').innerText = lang.comBtn;
@@ -252,9 +323,11 @@
         document.getElementById('authBody').innerText = lang.authBody;
         document.getElementById('authMeta').innerHTML = lang.authMeta;
         document.getElementById('runBtn').innerText = lang.btnRunText;
+        document.getElementById('modalCloseBtn').innerText = lang.modalClose;
         
         handleModeChange();
         document.getElementById('summaryResult').style.display = 'none';
+        closeCenterModal();
     }
 
     function handleModeChange() {
@@ -264,34 +337,35 @@
         if (mode === 'MULTIPLY') {
             area.innerHTML = `
                 <label style="font-size:14px;">${currentLang==='zh'?'乘数:':'Multiplier:'}</label>
-                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="35.5">
+                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="23">
                 <span style="font-weight:bold; color:#801d1a;">×</span>
-                <label style="font-size:14px;">${currentLang==='zh'?'反乘数:':'Multiplicand:'}</label>
-                <input type="number" id="param2" min="0.5" max="99.5" step="0.5" value="22.5">
+                <label style="font-size:14px;">${currentLang==='zh'?'被乘数:':'Multiplicand:'}</label>
+                <input type="number" id="param2" min="0.5" max="99.5" step="0.5" value="18">
             `;
         } else if (mode === 'DIVIDE') {
             area.innerHTML = `
                 <label style="font-size:14px;">${currentLang==='zh'?'被除数:':'Dividend:'}</label>
-                <input type="number" id="param1" min="0.25" max="9900.25" step="0.01" value="9900.25">
+                <input type="number" id="param1" min="0.25" max="9900.25" step="0.01" value="45">
                 <span style="font-weight:bold; color:#801d1a;">÷</span>
                 <label style="font-size:14px;">${currentLang==='zh'?'除数:':'Divisor:'}</label>
-                <input type="number" id="param2" min="0.5" max="9900.25" step="0.01" value="9900.25">
+                <input type="number" id="param2" min="0.5" max="9900.25" step="0.01" value="15">
             `;
         } else if (mode === 'SQUARE') {
             area.innerHTML = `
                 <label style="font-size:14px;">${currentLang==='zh'?'底数:':'Base (X):'}</label>
-                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="25.5">
+                <input type="number" id="param1" min="0.5" max="99.5" step="0.5" value="12.5">
             `;
         } else if (mode === 'SQRT') {
             area.innerHTML = `
                 <label style="font-size:14px;">${currentLang==='zh'?'被开方数:':'Radicand (X):'}</label>
-                <input type="number" id="param1" min="0.25" max="9900.25" step="0.01" value="650.25">
+                <input type="number" id="param1" min="0.25" max="9900.25" step="0.01" value="225">
             `;
         }
     }
 
     function initMatrix() {
         const table = document.getElementById('suanbiaoMatrix');
+        if (!table) return;
         let html = '<tr>';
         colHeaders.forEach(num => { html += `<th class="multiplier-title" id="col-h-${num}">${num}</th>`; });
         html += '<th class="static-header">——</th><th class="static-header">——</th></tr>';
@@ -331,7 +405,54 @@
         return parts;
     }
 
+    function quickExample(mode, val1, val2) {
+        const modeSelect = document.getElementById('calcModeSelect');
+        modeSelect.value = mode;
+        handleModeChange(); 
+        
+        document.getElementById('param1').value = val1;
+        if(val2 !== undefined) {
+            document.getElementById('param2').value = val2;
+        }
+        
+        document.getElementById('suanbiaoMatrix').scrollIntoView({ behavior: 'smooth' });
+        executeSuanbiaoAnimation();
+    }
+
+    function openCenterModal(contentHtml) {
+        const overlay = document.getElementById('centerModalOverlay');
+        const body = document.getElementById('modalBody');
+        document.getElementById('modalTitle').innerText = i18nData[currentLang].modalHeadText;
+        
+        body.innerHTML = contentHtml;
+        overlay.classList.add('active');
+
+        if(modalTimer) clearInterval(modalTimer);
+        
+        let timeLeft = 10;
+        const tipEl = document.getElementById('modalCountdown');
+        tipEl.innerText = i18nData[currentLang].countdownTip.replace('{time}', timeLeft);
+
+        modalTimer = setInterval(() => {
+            timeLeft--;
+            if(timeLeft <= 0) {
+                closeCenterModal();
+            } else {
+                tipEl.innerText = i18nData[currentLang].countdownTip.replace('{time}', timeLeft);
+            }
+        }, 1000);
+    }
+
+    function closeCenterModal() {
+        document.getElementById('centerModalOverlay').classList.remove('active');
+        if(modalTimer) {
+            clearInterval(modalTimer);
+            modalTimer = null;
+        }
+    }
+
     function executeSuanbiaoAnimation() {
+        closeCenterModal();
         document.querySelectorAll('td, th').forEach(el => {
             el.classList.remove('laser-beam-col', 'laser-beam-row', 'intersection-cell', 'answer-highlight');
         });
@@ -347,59 +468,34 @@
 
         if (mode === 'MULTIPLY') {
             p2 = parseFloat(document.getElementById('param2').value);
-            if (isInvalidFactor(p1) || isInvalidFactor(p2)) {
-                alert(lang.alertLimit);
-                return;
-            }
+            if (isInvalidFactor(p1) || isInvalidFactor(p2)) { alert(lang.alertLimit); return; }
             colsToLight = splitNumberCorrected(p1);
             rowsToLight = splitNumberCorrected(p2);
         } 
         else if (mode === 'SQUARE') {
-            if (isInvalidFactor(p1)) {
-                alert(lang.alertLimit);
-                return;
-            }
+            if (isInvalidFactor(p1)) { alert(lang.alertLimit); return; }
             colsToLight = splitNumberCorrected(p1);
             rowsToLight = splitNumberCorrected(p1);
         } 
         else if (mode === 'DIVIDE') {
             p2 = parseFloat(document.getElementById('param2').value);
-            if (p1 > 9900.25 || p2 > 9900.25 || p1 <= 0 || p2 <= 0) {
-                alert(lang.alertDivLimit);
-                return;
-            }
+            if (p1 > 9900.25 || p2 > 9900.25 || p1 <= 0 || p2 <= 0) { alert(lang.alertDivLimit); return; }
             
             expectedQuotient = p1 / p2;
-            
-            // 核心修复逻辑：若输入值在 [0.5 - 99.5] 范围外（例如大数 9900.25），进行大表可用范围的动态约束与降维映射
             let renderDivisor = (p2 >= 0.5 && p2 <= 99.5) ? p2 : 99.5;
             if (renderDivisor !== 99.5 && renderDivisor % 1 !== 0 && renderDivisor % 1 !== 0.5) {
                 renderDivisor = Math.round(renderDivisor * 2) / 2;
             }
-
             let renderQuotient = (expectedQuotient >= 0.5 && expectedQuotient <= 99.5) ? expectedQuotient : 99.5;
             if (renderQuotient !== 99.5 && renderQuotient % 1 !== 0 && renderQuotient % 1 !== 0.5) {
                 renderQuotient = Math.round(renderQuotient * 2) / 2;
             }
-
-            // 对于大数极限运算（如 9900.25 ÷ 9900.25 = 1），商为 1 在大表量程内，直接真实映射
-            if (expectedQuotient >= 0.5 && expectedQuotient <= 99.5) {
-                renderQuotient = expectedQuotient;
-                if (renderQuotient % 1 !== 0 && renderQuotient % 1 !== 0.5) {
-                    renderQuotient = Math.round(renderQuotient * 2) / 2;
-                }
-            }
-
             colsToLight = splitNumberCorrected(renderDivisor);
             rowsToLight = splitNumberCorrected(renderQuotient);
         } 
         else if (mode === 'SQRT') {
-            if (p1 > 9900.25 || p1 < 0.25) {
-                alert(lang.alertSqrtLimit);
-                return;
-            }
+            if (p1 > 9900.25 || p1 < 0.25) { alert(lang.alertSqrtLimit); return; }
             expectedRoot = Math.sqrt(p1);
-            
             let approximateRoot = expectedRoot;
             if (approximateRoot < 0.5) approximateRoot = 0.5;
             if (approximateRoot > 99.5) approximateRoot = 99.5;
@@ -410,10 +506,9 @@
             rowsToLight = splitNumberCorrected(approximateRoot);
         }
 
-        // ================== 朱砂丝线编织动态模拟 ==================
-        const animationSpeed = 75; 
+        const animationSpeed = 40; 
 
-        // 纵向列线向下流淌
+        // 丝线动画
         colsToLight.forEach(c => {
             let colHead = document.getElementById(`col-h-${c}`);
             if (colHead) colHead.classList.add('laser-beam-col');
@@ -424,7 +519,6 @@
             });
         });
 
-        // 横向行线向左流淌
         rowsToLight.forEach(r => {
             let rowHead = document.getElementById(`row-h-${r}`);
             if (rowHead) {
@@ -439,7 +533,7 @@
             });
         });
 
-        // 延迟一并触发相交汇算与报告
+        // 核心渲染
         setTimeout(() => {
             let summaryBox = document.getElementById('summaryResult');
             let details = [], sum = 0;
@@ -456,31 +550,73 @@
                 });
             });
 
+            let finalHtmlContent = "";
+
             if (mode === 'MULTIPLY') {
-                let linesText = lang.logMulLines.replace('{cols}', colsToLight.join(', ')).replace('{rows}', rowsToLight.join(', '));
-                summaryBox.innerHTML = `<strong>${lang.logMulTitle}</strong><br>${linesText}<br>${lang.logMulCross}${details.join(' ； ')}<br>${lang.logMulResult}<strong>${Math.round(sum*100)/100}</strong>`;
-            } else if (mode === 'DIVIDE') {
-                let pText = lang.logDivParam.replace('{p2}', p2).replace('{cols}', colsToLight.join(', '));
+                let linesText = lang.logMulLines.replace('{cols}', colsToLight.join(' + ')).replace('{rows}', rowsToLight.join(' + '));
+                let formulaHtml = currentLang === 'zh' ? 
+                    `📋 现代数学分配律拆解：<br>(${colsToLight.join(' + ')}) × (${rowsToLight.join(' + ')})<br>= ` :
+                    `📋 Distributive Law Expansion:<br>(${colsToLight.join(' + ')}) × (${rowsToLight.join(' + ')})<br>= `;
+                formulaHtml += details.map(d => `<span style="background:rgba(128,29,26,0.06); padding:2px 5px; margin:2px; display:inline-block; font-size:12px; border:1px dashed #aa9671;">${d}</span>`).join(' + ');
+
+                finalHtmlContent = `
+                    <p style="margin:4px 0;"><b>${currentLang==='zh'?'运算模式：乘法模式':'Operation: Multiplication'}</b></p>
+                    <p style="margin:4px 0;">${linesText}</p>
+                    <div style="background:#f2e6cc; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #c5b593;">${formulaHtml}</div>
+                    <p style="font-size:16px; margin:4px 0;"><b>${lang.logMulResult} <span style="color:#801d1a; font-size:22px;">${Math.round(sum*100)/100}</span></b></p>
+                `;
+            } 
+            else if (mode === 'DIVIDE') {
+                let pText = lang.logDivParam.replace('{p2}', p2).replace('{cols}', colsToLight.join(' + '));
                 let formattedQuotient = (expectedQuotient % 1 === 0 || expectedQuotient % 1 === 0.5) ? expectedQuotient : expectedQuotient.toFixed(3);
-                let fText = lang.logDivFind.replace('{quotient}', formattedQuotient).replace('{rows}', rowsToLight.join(', '));
-                summaryBox.innerHTML = `<strong>${lang.logDivTitle}</strong><br>${pText}<br>${fText}<br>${lang.logDivResult}<strong>${formattedQuotient}</strong>`;
-            } else if (mode === 'SQUARE') {
-                let pText = lang.logSqrParam.replace('{num}', p1).replace('{parts}', colsToLight.join(', '));
-                summaryBox.innerHTML = `<strong>${lang.logSqrTitle}</strong><br>${pText}<br>${lang.logSqrResult}<strong>${p1}² = ${Math.round(sum*100)/100}</strong>`;
-            } else if (mode === 'SQRT') {
+                let fText = lang.logDivFind.replace('{quotient}', formattedQuotient).replace('{rows}', rowsToLight.join(' + '));
+                
+                finalHtmlContent = `
+                    <p style="margin:4px 0;"><b>${currentLang==='zh'?'运算模式：除法逆向推演':'Operation: Reverse Division'}</b></p>
+                    <p style="margin:4px 0;">${pText}</p>
+                    <p style="margin:4px 0;">${fText}</p>
+                    <div style="background:#e4d3ab; padding:8px; border-radius:4px; font-size:13px; margin:8px 0; border-left:4px solid #801d1a;">${lang.divExplanation}</div>
+                    <p style="font-size:16px; margin:4px 0;"><b>${lang.logDivResult} <span style="color:#801d1a; font-size:22px;">${formattedQuotient}</span></b></p>
+                `;
+            } 
+            else if (mode === 'SQUARE') {
+                let pText = lang.logSqrParam.replace('{num}', p1).replace('{parts}', colsToLight.join(' + '));
+                let formulaHtml = `(${colsToLight.join(' + ')})² = ` + details.map(d => `${d.split('=')[1]}`).join(' + ');
+
+                finalHtmlContent = `
+                    <p style="margin:4px 0;"><b>${currentLang==='zh'?'运算模式：求平方 (完全对称拉线)':'Operation: Square'}</b></p>
+                    <p style="margin:4px 0;">${pText}</p>
+                    <div style="background:#f2e6cc; padding:8px; border-radius:4px; margin:8px 0; border:1px solid #c5b593;">${formulaHtml}</div>
+                    <p style="font-size:16px; margin:4px 0;"><b>${lang.logSqrResult} <span style="color:#801d1a; font-size:22px;">${p1}² = ${Math.round(sum*100)/100}</span></b></p>
+                `;
+            } 
+            else if (mode === 'SQRT') {
                 let tText = lang.logRootParam1.replace('{p1}', p1);
                 let formattedRoot = (expectedRoot % 1 === 0 || expectedRoot % 1 === 0.5) ? expectedRoot : expectedRoot.toFixed(3);
-                let pText3 = lang.logRootParam3.replace('{parts}', colsToLight.join(', '));
-                summaryBox.innerHTML = `<strong>${lang.logRootTitle}</strong><br>${tText}<br>${lang.logRootParam2}<br>${pText3}<br>${lang.logRootResult}<strong>√${p1} = ${formattedRoot}</strong>`;
+                
+                finalHtmlContent = `
+                    <p style="margin:4px 0;"><b>${currentLang==='zh'?'运算模式：逆向对角线开方':'Operation: Square Root'}</b></p>
+                    <p style="margin:4px 0;">${tText}</p>
+                    <p style="margin:4px 0;">${lang.logRootParam2}</p>
+                    <p style="margin:4px 0;">${lang.logRootParam3.replace('{parts}', colsToLight.join(' + '))}</p>
+                    <p style="font-size:16px; margin:4px 0;"><b>${lang.logRootResult} <span style="color:#801d1a; font-size:22px;">√${p1} ≈ ${formattedRoot}</span></b></p>
+                `;
             }
-            summaryBox.style.display = 'block';
-        }, (rowHeaders.length * animationSpeed) + 100);
+
+            // 同步渲染：常驻框显示 + 中央浮窗开启
+            summaryBox.innerHTML = finalHtmlContent;
+            summaryBox.style.display = 'block'; 
+            
+            openCenterModal(finalHtmlContent); 
+
+        }, (rowHeaders.length * animationSpeed) + 150);
     }
 
-    window.onload = function() {
-        switchLanguage();
+    // 弃用 window.onload，采用安全稳妥的立即执行挂载机制
+    (function() {
         initMatrix();
-    };
+        handleModeChange();
+    })();
 </script>
 
 </body>
